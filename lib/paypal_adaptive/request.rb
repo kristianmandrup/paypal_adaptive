@@ -96,8 +96,11 @@ module PaypalAdaptive
       http.ca_path = @ssl_cert_path unless @ssl_cert_path.nil?
 
       begin
-        response_data = http.post(path, api_request_data, @headers)
-        return JSON.parse(response_data.body)
+        response = http.post(path, api_request_data, @headers)
+
+        raise response.error! unless response.is_a?(Net::HTTPOK)
+
+        return JSON.parse(response.body)
       rescue Net::HTTPBadGateway => e
         rescue_error_message(e, "Error reading from remote server.")
       rescue Exception => e

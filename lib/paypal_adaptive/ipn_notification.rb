@@ -27,9 +27,11 @@ module PaypalAdaptive
       end
 
       path = "#{@paypal_base_url}/cgi-bin/webscr"
-      response_data = http.post(path, data).body
+      response = http.post(path, data)
 
-      @verified = response_data == "VERIFIED"
+      raise response.error! unless response.is_a?(Net::HTTPOK)
+
+      @verified = response.body == "VERIFIED"
     end
 
     def verified?
